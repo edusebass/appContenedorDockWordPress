@@ -1,13 +1,17 @@
-version: '3'
+version: "3"
 services:
   nginx:
-    build: 
+    build:
       context: ./Nginx
       dockerfile: Dockerfile
     container_name: nginx
     ports:
-      - 8084:80
-  
+      - "8084:80"
+    depends_on:
+      - wordpress1
+      - wordpress2
+      - wordpress3
+
   wordpress-db:
     image: mysql:5.7
     container_name: wordpress-db
@@ -16,8 +20,8 @@ services:
       MYSQL_DATABASE: wordpress
     ports:
       - "3308:3306"
-    command: --server-id=1 --log-bin=mysql-bin --log-error=mysql-bin.err --binlog-do-db=wordpress-db
-  
+    command: --server-id=1 --log-bin=mysql-bin --log-error=mysql-bin.err --binlog-do-db=wordpress
+
   mysql-slave:
     image: mysql:5.7
     container_name: mysql-slave
@@ -26,7 +30,9 @@ services:
       MYSQL_DATABASE: wordpress
     ports:
       - "3309:3306"
-    command: --server-id=2 --log-bin=mysql-bin --log-error=mysql-bin.err --binlog-do-db=wordpress-db
+    command: --server-id=2 --log-bin=mysql-bin --log-error=mysql-bin.err --binlog-do-db=wordpress
+    depends_on:
+      - wordpress-db
 
   wordpress1:
     image: wordpress:latest
@@ -37,7 +43,7 @@ services:
       WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: root
     ports:
-    - "8085:80"
+      - "8085:80"
     depends_on:
       - wordpress-db
 
@@ -69,10 +75,10 @@ services:
 
   phpmyadmin:
     image: phpmyadmin:latest
-    container_name: php
+    container_name: phpmyadmin
     ports:
       - "8080:80"
     environment:
-      PMA_HOST: wordpress
-      PMA_ARBITRARY: 1
-
+      PMA_HOST: wordpress-db
+      PMA_USER: root
+      PMA_PASSWORD: root
