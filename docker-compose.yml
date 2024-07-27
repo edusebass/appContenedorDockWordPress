@@ -1,0 +1,78 @@
+version: '3'
+services:
+  nginx:
+    build: 
+      context: ./Nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - 8084:80
+  
+  wordpress-db:
+    image: mysql:5.7
+    container_name: wordpress-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+    ports:
+      - "3308:3306"
+    command: --server-id=1 --log-bin=mysql-bin --log-error=mysql-bin.err --binlog-do-db=wordpress-db
+  
+  mysql-slave:
+    image: mysql:5.7
+    container_name: mysql-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+    ports:
+      - "3309:3306"
+    command: --server-id=2 --log-bin=mysql-bin --log-error=mysql-bin.err --binlog-do-db=wordpress-db
+
+  wordpress1:
+    image: wordpress:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: root
+    ports:
+    - "8085:80"
+    depends_on:
+      - wordpress-db
+
+  wordpress2:
+    image: wordpress:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: root
+    ports:
+      - "8086:80"
+    depends_on:
+      - wordpress-db
+
+  wordpress3:
+    image: wordpress:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: root
+    ports:
+      - "8087:80"
+    depends_on:
+      - wordpress-db
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: php
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: wordpress
+      PMA_ARBITRARY: 1
+
