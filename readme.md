@@ -1,7 +1,7 @@
 - maestro
 
-CREATE USER 'replica'@'%' IDENTIFIED BY 'replica_password';
-GRANT REPLICATION SLAVE ON . TO 'replica'@'%';
+GRANT ALL PRIVILEGES ON _._ TO 'replica'@'%' IDENTIFIED BY 'replica_password';
+
 SHOW MASTER STATUS
 
 - esclavo
@@ -19,3 +19,25 @@ START SLAVE;
 
 -- Verifica el estado de la replicación
 SHOW SLAVE STATUS;
+
+234ert78\*
+
+/_ Servers configuration _/
+$i = 0;
+
+/_ First server _/
+$i++;
+$cfg['Servers'][$i]['host'] = 'wordpress-db'; // Maestro
+$cfg['Servers'][$i]['user'] = 'root';
+$cfg['Servers'][$i]['password'] = 'root';
+$cfg['Servers'][$i]['auth_type'] = 'config';
+
+/_ Second server _/
+$i++;
+$cfg['Servers'][$i]['host'] = 'mysql-slave'; // Esclavo
+$cfg['Servers'][$i]['user'] = 'root';
+$cfg['Servers'][$i]['password'] = 'root';
+$cfg['Servers'][$i]['auth_type'] = 'config';
+
+/_ End of servers configuration _/
+$cfg['ServerDefault'] = 1; // Define el servidor predeterminado
